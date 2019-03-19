@@ -57,12 +57,13 @@ class DijkstraExtendPath():
     
 class solve:
     def __init__(self,car_txt,cross_txt,road_txt):
-        # self.car=pd.read_csv(car_txt,sep=',|#|(|)',skiprows=0)#,names=['(','id','from','to','speed','planTime',')']
-        # self.cross=pd.read_csv(cross_txt,sep=',|#|(|)',skiprows=0)#,names=['(','id','roadId','roadId','roadId','roadId',')']
-        # self.road=pd.read_csv(road_txt,sep=',|#|(|)',skiprows=0)#sep=',|\#\(|\(|\)'#,names=['(','id','length','speed','channel','from','to','isDuplex',')']
-        self.car = self.processFirstLine(car_txt)
-        self.cross = self.processFirstLine(cross_txt)
-        self.road = self.processFirstLine(road_txt)
+
+        self.car=pd.read_csv(car_txt,sep=',|\#\(|\(|\)',engine='python')
+        self.cross=pd.read_csv(cross_txt,sep=',|\#\(|\(|\)',engine='python')
+        self.road=pd.read_csv(road_txt,sep=',|\#\(|\(|\)',engine='python')
+        # self.car = self.processFirstLine(car_txt)
+        # self.cross = self.processFirstLine(cross_txt)
+        # self.road = self.processFirstLine(road_txt)
         self.node=self.cross['id'].tolist()
         self.node_map_dic={}
         self.node_map = [[0 for val in range(len(self.node))] for val in range(len(self.node))]
@@ -123,7 +124,7 @@ def main_process(car_path,road_path,cross_path,answer_path):
     #(carId,StartTime,RoadId...)
     result =[]
     car_list = Solve.car['id']
-    # planTime_list = Solve.car['planTime']
+    planTime_list = Solve.car['planTime']
     # getRoadList = lambda id :Solve.cross.loc[Solve.cross['id']==id].iloc[:,2:6].values.astype(np.int64)[0].tolist()
     # cross_road =dict()
     # for key,carvalue in enumerate(pathes):
@@ -141,12 +142,12 @@ def main_process(car_path,road_path,cross_path,answer_path):
     #         one_path.extend(roadId)
     #         prevalue = current_value
     #     result.append(tuple(one_path))
-    planTime_list = Solve.car['planTime']
+    # planTime_list = Solve.car['planTime']
     road_cross_id={}
     getRoadList = lambda id :Solve.cross.loc[Solve.cross['id']==id].iloc[:,2:6].values.astype(np.int64)[0].tolist()
     for key,carvalue in enumerate(pathes):
         one_path=[]
-        one_path.extend([car_list[key],planTime_list[key]])
+        one_path.extend([car_list[key],planTime_list[key]+np.random.randint(0,50)])
         prevalue = carvalue[0][0]
         for current_value,_time in carvalue[1:]:
             if (prevalue+1,current_value+1) in road_cross_id.keys():
@@ -158,7 +159,7 @@ def main_process(car_path,road_path,cross_path,answer_path):
                 roadId.remove(-1)
             one_path.extend(roadId)
             prevalue = current_value
-    result.append(tuple(one_path))
+        result.append(tuple(one_path))
 
     with open(answer_path,'w') as f_w:
         f_w.write('#(carId,StartTime,RoadId...)\n')
