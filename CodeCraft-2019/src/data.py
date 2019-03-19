@@ -147,7 +147,7 @@ def main_process(car_path,road_path,cross_path,answer_path):
     getRoadList = lambda id :Solve.cross.loc[Solve.cross['id']==id].iloc[:,2:6].values.astype(np.int64)[0].tolist()
     for key,carvalue in enumerate(pathes):
         one_path=[]
-        one_path.extend([car_list[key],planTime_list[key]+np.random.randint(0,50)])
+        one_path.extend([car_list[key],planTime_list[key]+np.random.randint(0,5000)])
         prevalue = carvalue[0][0]
         for current_value,_time in carvalue[1:]:
             if (prevalue+1,current_value+1) in road_cross_id.keys():
