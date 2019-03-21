@@ -256,18 +256,17 @@ class solve:
 #                    print(type(car_row[1]))
                     road_time_costing = road_pandas['length'].values[0]*1.0/min(car_row[1],road_pandas['speed'].values[0])
                     cross_time.append(tuple([start_time,start_time+road_time_costing]))
-                    start_time = start_time+road_time_costing+index
+                    start_time = start_time+road_time_costing
                 self.car_cross_time[car_row[0]]=cross_time
                 index+=1
 
-        pass
 
 def main_process():
     """
     car_path,road_path,cross_path,answer_path
     """
     #Solve=solve('../1-map-training-1/')
-    Solve=solve('../config_9/')
+    Solve=solve('../config/')#/home/xi/Documents/code/competition/2019huawei/1-map-training-2/
 
     return Solve
 if __name__=='__main__':
