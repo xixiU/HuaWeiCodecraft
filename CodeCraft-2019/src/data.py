@@ -77,14 +77,16 @@ class solve:
 
     def grt_map(self,one_car):
         #speed=onecar['speed']
-        def speed(speed,lim_spd,length):
-            return length/min(speed,lim_spd)
+        #carspeed,load_speed,length,channel
+        # def speed(speed,lim_spd,length,channel):
+        #     return length/min(speed,lim_spd)
+        speed = lambda speed,lim_spd,length,channel:length/min(speed,lim_spd)/channel
         node_list=[]
         #print(one_car)
         for i in range(len(self.road)):
-            node_list.append(((self.road.ix[i]['from']),self.road.ix[i]['to'],speed(one_car['speed'],self.road.ix[i]['speed'],self.road.ix[i]['length'])))
+            node_list.append((self.road.ix[i]['from'],self.road.ix[i]['to'],speed(one_car['speed'],self.road.ix[i]['speed'],self.road.ix[i]['length'],self.road.ix[i]['channel'])))
             if self.road.ix[i]['isDuplex']==1:
-                node_list.append((self.road.ix[i]['to'],self.road.ix[i]['from'],speed(one_car['speed'],self.road.ix[i]['speed'],self.road.ix[i]['length'])))
+                node_list.append((self.road.ix[i]['to'],self.road.ix[i]['from'],speed(one_car['speed'],self.road.ix[i]['speed'],self.road.ix[i]['length'],self.road.ix[i]['channel'])))
         return node_list
     
     def get_path(self,one_car):
@@ -147,7 +149,7 @@ def main_process(car_path,road_path,cross_path,answer_path):
     getRoadList = lambda id :Solve.cross.loc[Solve.cross['id']==id].iloc[:,2:6].values.astype(np.int64)[0].tolist()
     for key,carvalue in enumerate(pathes):
         one_path=[]
-        one_path.extend([car_list[key],planTime_list[key]+np.random.randint(0,1000)])
+        one_path.extend([car_list[key],planTime_list[key]+np.random.randint(0,800)])
         prevalue = carvalue[0][0]
         for current_value,_time in carvalue[1:]:
             if (prevalue+1,current_value+1) in road_cross_id.keys():

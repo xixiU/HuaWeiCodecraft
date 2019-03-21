@@ -1,0 +1,13 @@
+{
+    "python.pythonPath": "/home/xi/anaconda3/bin/python",
+    "python.unitTest.unittestArgs": [
+        "-v",
+        "-s",
+        "./force",
+        "-p",
+        "*test.py"
+    ],
+    "python.unitTest.pyTestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false,
+    "python.unitTest.unittestEnabled": true
+}
