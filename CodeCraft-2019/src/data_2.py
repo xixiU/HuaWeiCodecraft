@@ -104,31 +104,11 @@ class road_t_distribution:
             self.from_to[item].append((y2,y1))
             del self.from_to[item][self.from_to[item].index(query_dic[item][0])]
             
-#class car_cluster:
-#    def __init__(self,car_list,path):
-
-      
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
 class solve:   
-    def __init__(self,path='../config/'):
-        car_txt=path+'car.txt'
-        cross_txt=path+'cross.txt'
-        road_txt=path+'road.txt'
+    def __init__(self,car_txt,cross_txt,road_txt):
+        # car_txt=path+'car.txt'
+        # cross_txt=path+'cross.txt'
+        # road_txt=path+'road.txt'
         self.car=pd.read_csv(car_txt,sep=',|\#\(|\(|\)',engine='python')
         self.cross=pd.read_csv(cross_txt,sep=',|\#\(|\(|\)',engine='python')
         self.road=pd.read_csv(road_txt,sep=',|\#\(|\(|\)',engine='python')
@@ -162,23 +142,32 @@ class solve:
             road_c=dict()
             road_time=dict()
             road_weight=dict()
+            road_from_path=dict()
             for row_index,item in road.iterrows():
                 road_c[(item['from'],item['to'])]=item['channel']
                 road_time[(item['from'],item['to'])]={}
                 road_weight[(item['from'],item['to'])]=item['length']
+                road_from_path[(item['from'],item['to'])]=item['id']
                 if item['isDuplex']:
                    road_c[(item['to'],item['from'])]=item['channel']
                    road_time[(item['to'],item['from'])]={}
                    road_weight[(item['to'],item['from'])]=item['length']/item['channel']
-            return road_weight,road_c,road_time
+                   road_from_path[(item['to'],item['from'])]=item['id']
+            return road_weight,road_c,road_time,road_from_path
         #self.from_to=self.car.apply(lambda item : (item['from'],item['to']),axis=1)
-        self.road_dynamic_weight,self.road_condition,self.road_time=get_condition(self.road)
+        self.road_dynamic_weight,self.road_condition,self.road_time,self.right_from_to_pathes=get_condition(self.road)
         for item in self.from_to_sorted:
             path=self.get_path(item)
             self.from_to_pathes_dic[item[0]]=path
             #self.car[self.car['from_to']==item]['from_to']=path
+        self.road_dis=road_t_distribution(self.road_dynamic_weight.keys())
         self.get_crossTime()
-        
+        #print(self.real_car_time)
+        #print(self.from_to_pathes_dic)
+    
+    
+    
+    
     
     def grt_map(self):
         #speed=onecar['speed']
@@ -239,10 +228,12 @@ class solve:
         
     def get_crossTime(self):
         self.car_cross_time={}
+        self.real_car_time={}
         for key ,cross_value in self.from_to_pathes_dic.items():
             #print(key)
             self.from_to_car_dic[key].sort_values(by=['speed'],inplace=True,ascending=False) 
             index = 0
+            time_window=dict()
             for car_row in self.from_to_car_dic[key][['id','speed']].itertuples(index=False):
 #                print(index)
 #                print(car_row)
@@ -256,23 +247,39 @@ class solve:
 #                    print(type(car_row[1]))
                     road_time_costing = road_pandas['length'].values[0]*1.0/min(car_row[1],road_pandas['speed'].values[0])
                     cross_time.append(tuple([start_time,start_time+road_time_costing]))
+                    if crosses not in time_window.keys():
+                        time_window[crosses]=tuple([start_time,start_time+road_time_costing])
+                    else:
+                        time_window[crosses]=tuple([min(start_time,time_window[crosses][0]),max(start_time+road_time_costing,time_window[crosses][1])])
                     start_time = start_time+road_time_costing
                 self.car_cross_time[car_row[0]]=cross_time
                 index+=1
+            get_add_time=self.road_dis(time_window)
+            for car_row in self.from_to_car_dic[key][['id','speed']].itertuples(index=False):
+                self.real_car_time[car_row[0]]= get_add_time+self.car_cross_time[car_row[0]][0][0]
+            
+                
 
-
-def main_process():
+def main_process(car_path,road_path,cross_path,answer_path):
     """
     car_path,road_path,cross_path,answer_path
     """
     #Solve=solve('../1-map-training-1/')
-    Solve=solve('../config/')#/home/xi/Documents/code/competition/2019huawei/1-map-training-2/
-
+    Solve=solve(car_path,cross_path,road_path)
+    with open(answer_path,'w') as f_w:
+        f_w.write('#(carId,StartTime,RoadId...)\n')
+        for t,ft in Solve.car[['id','from_to']].itertuples(index=False):
+            #print(t,ft)
+            list_=[t,Solve.real_car_time[t]]
+            list_.extend([Solve.right_from_to_pathes[item] for item in Solve.from_to_pathes_dic[ft]])
+            f_w.write('('+ ','.join(str(s) for s in list_) +')'+ '\n')
     return Solve
+    
 if __name__=='__main__':
    import time
    start=time.time()
-   r=main_process()
+   r=main_process('~/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/config/car.txt','~/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/config/cross.txt','~/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/config/road.txt','/home/xi/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/src/answer.txt')
+  
    cars = r.from_to_car_dic
    dicts = r.from_to_pathes_dic
    print(time.time()-start)

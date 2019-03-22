@@ -1,6 +1,6 @@
 import logging
 import sys
-from data import main_process
+from data_2 import main_process
 # logging.basicConfig(level=logging.DEBUG,
 #                     filename='../logs/CodeCraft-2019.log',
 #                     format='[%(asctime)s] %(levelname)s [%(funcName)s: %(filename)s, %(lineno)d] %(message)s',
