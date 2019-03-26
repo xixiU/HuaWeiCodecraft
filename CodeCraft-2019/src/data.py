@@ -116,9 +116,12 @@ class solve:
         self.car.drop(['Unnamed: 0','Unnamed: 6'],axis=1,inplace=True)
         self.cross.drop(['Unnamed: 0','Unnamed: 6'],axis=1,inplace=True)
         self.road.drop(['Unnamed: 0','Unnamed: 8'],axis=1,inplace=True)
+        
         self.getRoadList = lambda id :self.cross.loc[self.cross['id']==id].iloc[:,1:5].values.astype(np.int64)[0].tolist()
         self.get_road_from2cross = lambda cross1,cross2: list(set(self.getRoadList(int(cross1)))&set(self.getRoadList(int(cross2))))#转int 再求list
+        
         self.cross2Road={}#tuple(cross1,cross2):roadid dict
+        
         #得到出发点终点
         self.car['from_to']=self.car.apply(lambda item:(item['from'],item['to']),axis=1)
         #最终需要的两个属性
@@ -179,11 +182,14 @@ class solve:
         #print(one_car)
         
         for i in range(len(self.road)):
-            key=(self.road.loc[i]['from'],self.road.loc[i]['to'])
-            node_list.append((self.road.loc[i]['from'],self.road.loc[i]['to'],self.road_dynamic_weight[key]/self.road.loc[i]['speed']))
-            if self.road.loc[i]['isDuplex']==1:
-                key=(self.road.loc[i]['to'],self.road.loc[i]['from'])
-                node_list.append((self.road.loc[i]['to'],self.road.loc[i]['from'],self.road_dynamic_weight[key]/self.road.loc[i]['speed']))
+            from_=self.road['from'][i]
+            to_=self.road['to'][i]
+            speed_=self.road['speed'][i]
+            key=(from_,to_)
+            node_list.append((from_,to_,self.road_dynamic_weight[key]/speed_))
+            if self.road['isDuplex'][i]==1:
+                key=(to_,from_)
+                node_list.append((to_,from_,self.road_dynamic_weight[key]/speed_))
         return node_list
     
     def get_path(self,from_to):
@@ -271,7 +277,12 @@ def main_process(car_path,road_path,cross_path,answer_path):
             f_w.write('('+ ','.join(str(s) for s in list_) +')'+ '\n')
 
 if __name__=='__main__':
-    main_process('~/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/config/car.txt','~/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/config/cross.txt','~/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/config/road.txt','/home/xi/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/src/answer.txt')
+    path = '../config/'
+    car_txt=path+'car.txt'
+    cross_txt=path+'cross.txt'
+    road_txt=path+'road.txt'
+    answer_txt = path +'answer.txt'
+    main_process(car_txt,cross_txt,road_txt,answer_txt)
 #    Solve=solve('../config/car.txt', '../config/road.txt',' ../config/cross.txt',' ../config/answer.txt')
 #    pathes=Solve.get_pathes()
 #    #(carId,StartTime,RoadId...)
@@ -294,6 +305,7 @@ if __name__=='__main__':
 #        f_w.write('#(carId,StartTime,RoadId...)\n')
 #        for t in result:
 #            f_w.write('('+ ','.join(str(s) for s in t) +')'+ '\n')
+
     
 
 

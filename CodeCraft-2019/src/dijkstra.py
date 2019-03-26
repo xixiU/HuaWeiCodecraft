@@ -55,7 +55,7 @@ if __name__ == "__main__":
     set_node_map(node_map, node, node_list)
     # A -->; D
     from_node = node.index('A')
-    to_node = node.index('A')
+    to_node = node.index('D')
     dijkstrapath = DijkstraExtendPath(node_map)
     path = dijkstrapath(from_node, to_node)
     print(path)
