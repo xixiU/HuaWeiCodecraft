@@ -171,11 +171,7 @@ class solve:
         #print(time.time()-start)
         #print(self.real_car_time)
         #print(self.from_to_pathes_dic)
-    
-    
-    
-    
-    
+
     def grt_map(self):
         #speed=onecar['speed']
         node_list=[]
@@ -270,11 +266,11 @@ def main_process(car_path,road_path,cross_path,answer_path):
     Solve=solve(car_path,cross_path,road_path)#car_txt,cross_txt,road_txt
     with open(answer_path,'w') as f_w:
         f_w.write('#(carId,StartTime,RoadId...)\n')
-        for t,ft in Solve.car[['id','from_to']].itertuples(index=False):
-            #print(t,ft)
-            list_=[t,np.random.randint(10,450)]
+        for t,ft,plantime in Solve.car[['id','from_to','planTime']].itertuples(index=False):
+            list_=[t,plantime+np.random.randint(5,450)]
             list_.extend([Solve.right_from_to_pathes[item] for item in Solve.from_to_pathes_dic[ft]])
             f_w.write('('+ ','.join(str(s) for s in list_) +')'+ '\n')
+    return Solve
 
 if __name__=='__main__':
     path = '../config/'
@@ -282,7 +278,7 @@ if __name__=='__main__':
     cross_txt=path+'cross.txt'
     road_txt=path+'road.txt'
     answer_txt = path +'answer.txt'
-    main_process(car_txt,cross_txt,road_txt,answer_txt)
+    Solve = main_process(car_txt,road_txt,cross_txt,answer_txt)
 #    Solve=solve('../config/car.txt', '../config/road.txt',' ../config/cross.txt',' ../config/answer.txt')
 #    pathes=Solve.get_pathes()
 #    #(carId,StartTime,RoadId...)
