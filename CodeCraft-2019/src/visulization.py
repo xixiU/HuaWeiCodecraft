@@ -31,7 +31,7 @@ def processFirstLine(filepath='/home/xi/Documents/code/competition/2019huawei/1-
 
 edges=[]
 edgeandnode=[]
-cross_data = processFirstLine('/home/xi/Documents/code/competition/2019huawei/2019软挑-初赛-SDK/SDK/SDK_python/CodeCraft-2019/config/cross.txt')
+cross_data = processFirstLine('/home/xi/Documents/code/competition/2019huawei/1-map-training-1/1-map-exam-1')
 cross_id = cross_data['id'].values
 for cross in cross_id:
     road_list = set(cross_data[cross_data['id']==cross].values[0])#排除多个-1的情形

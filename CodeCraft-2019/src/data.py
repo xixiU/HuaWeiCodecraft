@@ -10,14 +10,15 @@ import pandas as pd
 import numpy as np
 from io import StringIO 
 import operator
-import time
+import time,os
 
 class DijkstraExtendPath():
-    def __init__(self, node_map):
+    def __init__(self, node_map,first_time=False):
         self.node_map = node_map
         self.node_length = len(node_map)
         self.used_node_list = []
         self.collected_node_dict = {}
+        self.first_time =first_time
     def __call__(self, from_node, to_node):
         self.from_node = from_node
         self.to_node = to_node
@@ -212,7 +213,7 @@ class solve:
     def translate_path(self,path):
         repath=[]
         for i in range(len(path)-1):
-            repath.append((path[i][0]+1,path[i+1][0]+1))
+            repath.append((self.node[path[i][0]],self.node[path[i+1][0]]))
         return tuple(repath)
     
     def get_pathes(self):
@@ -263,17 +264,18 @@ def main_process(car_path,road_path,cross_path,answer_path):
     """
     car_path,road_path,cross_path,answer_path
     """
+
     Solve=solve(car_path,cross_path,road_path)#car_txt,cross_txt,road_txt
     with open(answer_path,'w') as f_w:
         f_w.write('#(carId,StartTime,RoadId...)\n')
         for t,ft,plantime in Solve.car[['id','from_to','planTime']].itertuples(index=False):
-            list_=[t,plantime+np.random.randint(5,450)]
+            list_=[t,plantime+np.random.randint(5,1600)]
             list_.extend([Solve.right_from_to_pathes[item] for item in Solve.from_to_pathes_dic[ft]])
             f_w.write('('+ ','.join(str(s) for s in list_) +')'+ '\n')
     return Solve
 
 if __name__=='__main__':
-    path = '../config/'
+    path = '../1-map-exam-1/'
     car_txt=path+'car.txt'
     cross_txt=path+'cross.txt'
     road_txt=path+'road.txt'
