@@ -11,8 +11,9 @@ import numpy as np
 from io import StringIO 
 import operator
 import time,os
-
+firstRun=True
 class DijkstraExtendPath():
+    global firstRun
     def __init__(self, node_map,first_time=False):
         self.node_map = node_map
         self.node_length = len(node_map)
@@ -266,16 +267,18 @@ def main_process(car_path,road_path,cross_path,answer_path):
     """
 
     Solve=solve(car_path,cross_path,road_path)#car_txt,cross_txt,road_txt
+    np.random.seed(0)
+    time_ = np.random.randint(0,1550,size=(Solve.car.shape[0]))
     with open(answer_path,'w') as f_w:
         f_w.write('#(carId,StartTime,RoadId...)\n')
-        for t,ft,plantime in Solve.car[['id','from_to','planTime']].itertuples(index=False):
-            list_=[t,plantime+np.random.randint(5,1600)]
+        for index,t,ft,plantime in Solve.car[['id','from_to','planTime']].itertuples():#time_
+            list_=[t,plantime+time_[index]]#np.random.randint(plantime,1550)
             list_.extend([Solve.right_from_to_pathes[item] for item in Solve.from_to_pathes_dic[ft]])
             f_w.write('('+ ','.join(str(s) for s in list_) +')'+ '\n')
     return Solve
 
 if __name__=='__main__':
-    path = '../1-map-exam-1/'
+    path = '../config/'
     car_txt=path+'car.txt'
     cross_txt=path+'cross.txt'
     road_txt=path+'road.txt'

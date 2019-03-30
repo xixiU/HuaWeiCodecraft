@@ -590,7 +590,7 @@ class simulation(object):
         visualize.crossLocGen()
         while True:
             self.step()
-            visualize.drawMap()
+            #visualize.drawMap()
             if CARDISTRIBUTION[2]==CARNAMESPACE.__len__():
                 print(CARDISTRIBUTION[2])
                 break
